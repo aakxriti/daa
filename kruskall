@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent an edge
+struct Edge {
+    int src, dest, weight;
+};
+
+// Structure to represent a subset for union-find
+struct Subset {
+    int parent;
+    int rank;
+};
+
+// Function to compare two edges based on their weights
+int compare(const void* a, const void* b) {
+    struct Edge* edge1 = (struct Edge*)a;
+    struct Edge* edge2 = (struct Edge*)b;
+    return edge1->weight - edge2->weight;
+}
+
+// Function to find the parent of a vertex in a disjoint set
+int find(struct Subset subsets[], int i) {
+    if (subsets[i].parent != i)
+        subsets[i].parent = find(subsets, subsets[i].parent);
+    return subsets[i].parent;
+}
+
+// Function to perform union of two subsets
+void Union(struct Subset subsets[], int x, int y) {
+    int xroot = find(subsets, x);
+    int yroot = find(subsets, y);
+    if (subsets[xroot].rank < subsets[yroot].rank)
+        subsets[xroot].parent = yroot;
+    else if (subsets[xroot].rank > subsets[yroot].rank)
+        subsets[yroot].parent = xroot;
+    else {
+        subsets[yroot].parent = xroot;
+        subsets[xroot].rank++;
+    }
+}
+
+// Function to implement Kruskal's algorithm
+void KruskalMST(struct Edge edges[], int V, int E) {
+    // Allocate memory for the subsets
+    struct Subset* subsets = (struct Subset*)malloc(V * sizeof(struct Subset));
+    
+    // Initialize each subset as a single element set
+    for (int v = 0; v < V; v++) {
+        subsets[v].parent = v;
+        subsets[v].rank = 0;
+    }
+    
+    // Allocate memory for the minimum spanning tree
+    struct Edge* MST = (struct Edge*)malloc((V - 1) * sizeof(struct Edge));
+    
+    // Sort all the edges in non-decreasing order of their weight
+    qsort(edges, E, sizeof(edges[0]), compare);
+    
+    int e = 0; // Index variable for sorted edges
+    int i = 0; // Index variable for result
+
+    // Loop until we have V-1 edges in the minimum spanning tree
+    while (e < V - 1 && i < E) {
+        struct Edge next_edge = edges[i++];
+        int x = find(subsets, next_edge.src);
+        int y = find(subsets, next_edge.dest);
+        
+        // If including this edge does not form a cycle, add it to the minimum spanning tree
+        if (x != y) {
+            MST[e++] = next_edge;
+            Union(subsets, x, y);
+        }
+    }
+
+    // Output the minimum spanning tree
+    printf("Edges in the minimum spanning tree:\n");
+    for (int j = 0; j < e; j++) {
+        printf("%d - %d : %d\n", MST[j].src, MST[j].dest, MST[j].weight);
+    }
+
+    // Free allocated memory
+    free(subsets);
+    free(MST);
+}
+
+int main() {
+    int V, E;
+    // Input the number of vertices and edges
+    printf("Enter the number of houses (vertices) and connections (edges): ");
+    scanf("%d %d", &V, &E);
+
+    // Allocate memory for the edges
+    struct Edge* edges = (struct Edge*)malloc(E * sizeof(struct Edge));
+
+    // Input each edge: source, destination, and weight
+    printf("Enter the connections (source, destination, and weight):\n");
+    for (int i = 0; i < E; i++) {
+        scanf("%d %d %d", &edges[i].src, &edges[i].dest, &edges[i].weight);
+    }
+
+    // Call the Kruskal's algorithm function
+    KruskalMST(edges, V, E);
+
+    // Free allocated memory
+    free(edges);
+
+    return 0;
+}
