@@ -1,0 +1,79 @@
+// quick sort
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Structure to represent a file
+typedef struct {
+    int ID;
+    char name[100];
+} File;
+
+// Function to swap two files
+void swap(File* a, File* b) {
+    File temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Partition function for Quick sort
+int partition(File files[], int low, int high) {
+    int pivot = files[high].ID;
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++) {
+        if (files[j].ID < pivot) {
+            i++;
+            swap(&files[i], &files[j]);
+        }
+    }
+    swap(&files[i + 1], &files[high]);
+    return (i + 1);
+}
+
+// Quick sort function
+void quickSort(File files[], int low, int high) {
+    if (low < high) {
+        int pi = partition(files, low, high);
+        quickSort(files, low, pi - 1);
+        quickSort(files, pi + 1, high);
+    }
+}
+
+int main() {
+    int n;
+    clock_t start, end;
+    double cpu_time_used;
+
+    printf("Enter the number of files: ");
+    scanf("%d", &n);
+
+    File files[n];
+
+    // Generating random IDs for files
+    srand(time(NULL));
+    for (int i = 0; i < n; i++) {
+        files[i].ID = rand() % 1000 + 1; // Assuming maximum ID is 1000
+    }
+
+    start = clock(); // Start measuring time
+
+    // Sorting files based on ID
+    quickSort(files, 0, n - 1);
+
+    end = clock(); // Stop measuring time
+
+    // Calculating the time taken
+    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    printf("Time taken to sort %d files: %lf seconds\n", n, cpu_time_used);
+
+    // Displaying sorted files
+    printf("Sorted Files:\n");
+    for (int i = 0; i < n; i++) {
+        printf("ID: %d\n", files[i].ID);
+    }
+
+    return 0;
+}
