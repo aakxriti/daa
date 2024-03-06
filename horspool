@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CHAR 256
+
+// Function to preprocess the pattern and generate shift table
+void shiftTable(char *pattern, int patternLength, int *shift) {
+    int i;
+    for (i = 0; i < MAX_CHAR; i++) {
+        shift[i] = patternLength;
+    }
+    for (i = 0; i < patternLength - 1; i++) {
+        shift[pattern[i]] = patternLength - 1 - i;
+    }
+}
+
+// Function to search for the pattern in the text using Horspool algorithm
+int horspoolSearch(char *text, char *pattern) {
+    int textLength = strlen(text);
+    int patternLength = strlen(pattern);
+    int shift[MAX_CHAR];
+
+    // Preprocess the pattern to generate the shift table
+    shiftTable(pattern, patternLength, shift);
+
+    int i = patternLength - 1; // Index for text
+    int j; // Index for pattern
+
+    while (i < textLength) {
+        j = 0;
+        while (j < patternLength && pattern[patternLength - 1 - j] == text[i - j]) {
+            j++;
+        }
+        if (j == patternLength) {
+            return i - patternLength + 1; // Match found
+        }
+        i += shift[text[i]]; // Shift the window
+    }
+    return -1; // Match not found
+}
+
+int main() {
+    char text[] = "example text for searching";
+    char pattern[] = "text";
+
+    int pos = horspoolSearch(text, pattern);
+
+    if (pos != -1) {
+        printf("Pattern found at position: %d\n", pos);
+    } else {
+        printf("Pattern not found\n");
+    }
+
+    return 0;
+}
