@@ -1,0 +1,65 @@
+#include <stdio.h>
+
+#define INF 99999
+#define MAX_CITIES 100
+
+int dist[MAX_CITIES][MAX_CITIES];
+
+void floydWarshall(int numCities) {
+    int i, j, k;
+
+    // Initialize distance matrix
+    for (i = 0; i < numCities; i++) {
+        for (j = 0; j < numCities; j++) {
+            if (i == j) 
+                dist[i][j] = 0;
+            else 
+                dist[i][j] = INF;
+        }
+    }
+
+    // Input distance between cities
+    printf("Enter the distance between cities (use INF for no direct connection):\n");
+    for (i = 0; i < numCities; i++) {
+        for (j = 0; j < numCities; j++) {
+            scanf("%d", &dist[i][j]);
+        }
+    }
+
+    // Floyd's algorithm
+    for (k = 0; k < numCities; k++) {
+        for (i = 0; i < numCities; i++) {
+            for (j = 0; j < numCities; j++) {
+                if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                }
+            }
+        }
+    }
+}
+
+void printShortestPaths(int numCities) {
+    printf("Shortest distances between all pairs of cities:\n");
+    for (int i = 0; i < numCities; i++) {
+        for (int j = 0; j < numCities; j++) {
+            if (dist[i][j] == INF)
+                printf("INF ");
+            else
+                printf("%d ", dist[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int numCities;
+
+    printf("Enter the number of cities: ");
+    scanf("%d", &numCities);
+
+    floydWarshall(numCities);
+
+    printShortestPaths(numCities);
+
+    return 0;
+}
