@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 100
+
+// Queue implementation for BFS
+typedef struct {
+    int items[MAX_VERTICES];
+    int front;
+    int rear;
+} Queue;
+
+// Function to create a new queue
+Queue* createQueue() {
+    Queue* queue = (Queue*)malloc(sizeof(Queue));
+    queue->front = -1;
+    queue->rear = -1;
+    return queue;
+}
+
+// Function to check if the queue is empty
+int isEmpty(Queue* queue) {
+    return queue->front == -1;
+}
+
+// Function to add an item to the queue
+void enqueue(Queue* queue, int item) {
+    if (queue->rear == MAX_VERTICES - 1) {
+        printf("Queue is full\n");
+        return;
+    }
+    if (queue->front == -1)
+        queue->front = 0;
+    queue->rear++;
+    queue->items[queue->rear] = item;
+}
+
+// Function to remove an item from the queue
+int dequeue(Queue* queue) {
+    int item;
+    if (isEmpty(queue)) {
+        printf("Queue is empty\n");
+        return -1;
+    }
+    item = queue->items[queue->front];
+    queue->front++;
+    if (queue->front > queue->rear) {
+        queue->front = queue->rear = -1;
+    }
+    return item;
+}
+
+// Structure to represent a graph
+typedef struct {
+    int vertices;
+    int** adjacencyMatrix;
+} Graph;
+
+// Function to create a new graph
+Graph* createGraph(int vertices) {
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    graph->vertices = vertices;
+
+    // Allocate memory for adjacency matrix
+    graph->adjacencyMatrix = (int**)malloc(vertices * sizeof(int*));
+    for (int i = 0; i < vertices; i++) {
+        graph->adjacencyMatrix[i] = (int*)malloc(vertices * sizeof(int));
+        for (int j = 0; j < vertices; j++) {
+            graph->adjacencyMatrix[i][j] = 0;
+        }
+    }
+
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(Graph* graph, int source, int destination) {
+    graph->adjacencyMatrix[source][destination] = 1;
+}
+
+// Function to perform BFS traversal starting from a given vertex
+void BFS(Graph* graph, int startVertex) {
+    int visited[MAX_VERTICES] = {0};
+    Queue* queue = createQueue();
+
+    visited[startVertex] = 1;
+    enqueue(queue, startVertex);
+
+    printf("Nodes reachable from vertex %d using BFS: ", startVertex);
+
+    while (!isEmpty(queue)) {
+        int currentVertex = dequeue(queue);
+        printf("%d ", currentVertex);
+
+        for (int i = 0; i < graph->vertices; i++) {
+            if (graph->adjacencyMatrix[currentVertex][i] == 1 && !visited[i]) {
+                visited[i] = 1;
+                enqueue(queue, i);
+            }
+        }
+    }
+
+    printf("\n");
+
+    free(queue);
+}
+
+int main() {
+    int vertices, edges, source;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
+    Graph* graph = createGraph(vertices);
+
+    printf("Enter the number of edges: ");
+    scanf("%d", &edges);
+
+    for (int i = 0; i < edges; i++) {
+        int source, destination;
+        printf("Enter edge %d (source destination): ", i + 1);
+        scanf("%d %d", &source, &destination);
+        addEdge(graph, source, destination);
+    }
+
+    printf("Enter the starting vertex for BFS: ");
+    scanf("%d", &source);
+
+    BFS(graph, source);
+
+    return 0;
+}
