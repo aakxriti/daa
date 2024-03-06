@@ -1,0 +1,62 @@
+// selection sort
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX_EMPLOYEES 10000
+
+// Function to perform selection sort
+void selectionSort(int arr[], int n) {
+    int i, j, min_idx;
+    for (i = 0; i < n - 1; i++) {
+        min_idx = i;
+        for (j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+        // Swap the found minimum element with the first element
+        int temp = arr[min_idx];
+        arr[min_idx] = arr[i];
+        arr[i] = temp;
+    }
+}
+
+int main() {
+    int employees[MAX_EMPLOYEES];
+    int n;
+    clock_t start, end;
+    double cpu_time_used;
+
+    printf("Enter the number of employees: ");
+    scanf("%d", &n);
+
+    if (n > MAX_EMPLOYEES) {
+        printf("Number of employees exceeds maximum limit.\n");
+        return 1;
+    }
+
+    // Generating random employee IDs
+    for (int i = 0; i < n; i++) {
+        employees[i] = rand() % 100000; // Assuming maximum employee ID is 99999
+    }
+
+    start = clock(); // Start measuring time
+
+    // Sorting employee IDs
+    selectionSort(employees, n);
+
+    end = clock(); // Stop measuring time
+
+    // Calculating the time taken
+    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    printf("Time taken to sort %d employee IDs: %lf seconds\n", n, cpu_time_used);
+
+    // Code for plotting graph goes here
+    // You'll need to save the number of employee IDs and corresponding time taken to a file,
+    // and then use a plotting library like gnuplot to plot the graph.
+
+    return 0;
+}
