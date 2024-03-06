@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define N 8 // Change this to the desired value of N
+
+int board[N][N];
+
+// Function to check if it's safe to place a student at board[row][col]
+bool isSafe(int row, int col) {
+    // Check if there is a student in the same row
+    for (int i = 0; i < col; i++)
+        if (board[row][i])
+            return false;
+
+    // Check upper diagonal on left side
+    for (int i = row, j = col; i >= 0 && j >= 0; i--, j--)
+        if (board[i][j])
+            return false;
+
+    // Check lower diagonal on left side
+    for (int i = row, j = col; j >= 0 && i < N; i++, j--)
+        if (board[i][j])
+            return false;
+
+    return true;
+}
+
+// Recursive function to solve N-queens problem
+bool solveNQueens(int col) {
+    // Base case: If all queens are placed, return true
+    if (col >= N)
+        return true;
+
+    // Try placing this queen in all rows one by one
+    for (int i = 0; i < N; i++) {
+        // Check if the queen can be placed in board[i][col]
+        if (isSafe(i, col)) {
+            // Place the queen
+            board[i][col] = 1;
+
+            // Recur to place rest of the queens
+            if (solveNQueens(col + 1))
+                return true;
+
+            // If placing queen in board[i][col] doesn't lead to a solution,
+            // then remove the queen from board[i][col]
+            board[i][col] = 0;
+        }
+    }
+
+    // If the queen cannot be placed in any row in this column, return false
+    return false;
+}
+
+// Function to print the solution
+void printSolution() {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++)
+            printf("%d ", board[i][j]);
+        printf("\n");
+    }
+}
+
+int main() {
+    // Initialize the board
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++)
+            board[i][j] = 0;
+
+    if (solveNQueens(0) == false) {
+        printf("Solution does not exist");
+    } else {
+        printf("Solution:\n");
+        printSolution();
+    }
+
+    return 0;
+}
